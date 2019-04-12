@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+
+    <appender name="custom" class="CustomAppender">
+        <server>192.168.0.124</server>
+        <port>12201</port>
+        <protocol>http</protocol>
+        <version>1.1</version>
+        <asynchronous>false</asynchronous>
+        <timemills>1000</timemills>
+        <retryattempts>3</retryattempts>
+    </appender>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{"yyyy-MM-dd'T'HH:mm:ss,SSSXXX", UTC} [%thread] %-5level %logger{36} - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="GRAYLOG" class="de.appelgriepsch.logback.GelfAppender">
+        <server>192.168.0.124</server>
+        <port>12201</port>
+      <!--  <hostName>localhost</hostName>-->
+        <protocol>TCP</protocol>
+        <includeSource>true</includeSource>
+        <includeMDC>true</includeMDC>
+        <queueSize>512</queueSize>
+        <connectTimeout>1000</connectTimeout>
+        <reconnectDelay>500</reconnectDelay>
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%.-25m</pattern>
+        </layout>
+        <filter class="ch.qos.logback.core.filter.EvaluatorFilter">
+            <evaluator>
+                <expression>logger.contains("Test")</expression>
+            </evaluator>
+            <onMatch>DENY</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+    </appender>
+
+    <!-- Graylog has verbose INFO logging so set to WARN -->
+    <logger name="stdout" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT" />
+    </logger>
+
+    <!-- Graylog has verbose INFO logging so set to WARN -->
+    <logger name="httplogger" level="DEBUG" additivity="false">
+        <appender-ref ref="custom" />
+    </logger>
+
+    <root level="DEBUG">
+        <appender-ref ref="STDOUT" />
+        <appender-ref ref="GRAYLOG" />
+    </root>
+
+</configuration>
