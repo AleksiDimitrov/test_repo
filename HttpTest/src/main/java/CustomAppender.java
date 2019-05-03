@@ -25,7 +25,6 @@ public class CustomAppender extends AppenderBase<ILoggingEvent> {
     private int statusCode;
     private Client client = ClientBuilder.newClient();
 
-
     public void setServer(String server) {
         this.server = server;
     }
@@ -83,27 +82,24 @@ public class CustomAppender extends AppenderBase<ILoggingEvent> {
     }
 
 
-    public int postMessage(String server, String port, String protocol, String host, String version, String short_message) {
+    public synchronized TestValues postMessage(String server, String port, String protocol, String host, String version, String short_message) {
         int attempts = retryattempts;
 
         try {
             bodyObj = new Body(version, host, short_message);
             do {
                 Response response = client.target(setEndpoint(server, port, protocol)).request(MediaType.APPLICATION_JSON).post(Entity.entity(bodyObj, MediaType.APPLICATION_JSON));
-//                HttpResponse<JsonNode> response = Unirest.post(setEndpoint(server, port, protocol)).header("accept", "ddddd")
-//                        .body(bodyObj).asJson();
                 statusCode = response.getStatus();
                 attempts--;
                 Thread.sleep(timemills);
-            } while (statusCode >= 300 && attempts > 0);
+            } while (statusCode != 202 && attempts > 0);
         } catch (InterruptedException e) {
-            e.printStackTrace();
+            logger.debug(e.getMessage());
         }
-        System.out.println(attempts);
-        return attempts;
+        return new TestValues(attempts,statusCode);
     }
 
-    public int postMessageAsync(String server, String port, String protocol, String host, String version, String short_message) {
+    public synchronized TestValues postMessageAsync(String server, String port, String protocol, String host, String version, String short_message) {
 
         bodyObj = new Body(version, host, short_message);
         int attempts = retryattempts;
@@ -114,17 +110,17 @@ public class CustomAppender extends AppenderBase<ILoggingEvent> {
             try {
                 statusCode = response.get().getStatus();
             } catch (InterruptedException e) {
-                e.printStackTrace();
+               logger.debug(e.getMessage());
             } catch (ExecutionException e) {
-                e.printStackTrace();
+                logger.debug(e.getMessage());
             }
             try {
                 Thread.sleep(timemills);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                logger.debug(e.getMessage());
             }
-        } while (statusCode >= 300 && attempts > 0);
-        return attempts;
+        } while (statusCode != 202 && attempts > 0);
+        return new TestValues(attempts,statusCode);
     }
 
     protected void append(ILoggingEvent iLoggingEvent) {
@@ -132,19 +128,14 @@ public class CustomAppender extends AppenderBase<ILoggingEvent> {
         LoggingEvent copy = new LoggingEvent();
         copy.setLoggerName(iLoggingEvent.getLoggerName());
         iLoggingEvent.getMessage();
-
-        if (asynchronous == true) {
+        if (asynchronous) {
             postMessageAsync(server, port, protocol, iLoggingEvent.getLoggerName(), version, iLoggingEvent.getMessage());
-
         } else {
             postMessage(server, port, protocol, iLoggingEvent.getLoggerName(), version, iLoggingEvent.getMessage());
         }
-
     }
 
     private String setEndpoint(String server, String port, String protocol) {
         return endpoint = protocol + "://" + server + ":" + port + "/gelf";
     }
-
-
 }

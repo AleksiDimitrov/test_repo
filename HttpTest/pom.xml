@@ -31,11 +31,6 @@
         </dependency>
 
         <dependency>
-            <groupId>com.mashape.unirest</groupId>
-            <artifactId>unirest-java</artifactId>
-            <version>1.4.9</version>
-        </dependency>
-        <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.3.6</version>
@@ -110,6 +105,11 @@
             <artifactId>jersey-client</artifactId>
             <version>2.25.1</version>
         </dependency>
+        <dependency>
+            <groupId>com.mashape.unirest</groupId>
+            <artifactId>unirest-java</artifactId>
+            <version>1.4.9</version>
+        </dependency>
 
     </dependencies>
     <build>
@@ -121,7 +121,7 @@
         <configuration>
             <serverPort>1080</serverPort>
             <logLevel>DEBUG</logLevel>
-            <initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>
+           <!-- <initializationClass>org.mockserver.maven.ExampleInitializationClass</initializationClass>-->
         </configuration>
         <executions>
             <execution>
@@ -140,6 +140,26 @@
             </execution>
         </executions>
     </plugin>
+            <plugin>
+                <groupId>org.jacoco</groupId>
+                <artifactId>jacoco-maven-plugin</artifactId>
+                <version>0.8.2</version>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>prepare-agent</goal>
+                        </goals>
+                    </execution>
+                    <!-- attached to Maven test phase -->
+                    <execution>
+                        <id>report</id>
+                        <phase>test</phase>
+                        <goals>
+                            <goal>report</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
 </project>
