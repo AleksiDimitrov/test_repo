@@ -3,3 +3,9 @@
 *.iml
 *.iws
 target/
+*.class
+*.jar
+*.war
+*.ear
+*.logs
+*.iml
