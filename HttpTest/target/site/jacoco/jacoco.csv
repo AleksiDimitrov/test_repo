@@ -1,6 +1,0 @@
-GROUP,PACKAGE,CLASS,INSTRUCTION_MISSED,INSTRUCTION_COVERED,BRANCH_MISSED,BRANCH_COVERED,LINE_MISSED,LINE_COVERED,COMPLEXITY_MISSED,COMPLEXITY_COVERED,METHOD_MISSED,METHOD_COVERED
-http-project,default,ServerSet,71,0,0,0,13,0,4,0,4,0
-http-project,default,Test,26,0,0,0,9,0,3,0,3,0
-http-project,default,CustomAppender,37,217,0,10,13,46,7,18,7,13
-http-project,default,TestValues,3,12,0,0,1,5,1,2,1,2
-http-project,default,Body,0,12,0,0,0,5,0,1,0,1
